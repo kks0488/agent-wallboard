@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="/favicon.ico">
+<title>Agent wallboard</title>
+<style>
+:root{--background:#161618;--card:#1f1f22;--text:#f5f5f7;--secondary:#98989d;--line:#2c2c2e;--urgent:#eb574d;--attention:#ec9e32;--normal:#4cc270}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--background);color:var(--text)}
+body,button{font-family:"Apple SD Gothic Neo","Pretendard","Noto Sans KR",system-ui,sans-serif;font-size:24px;line-height:32px;font-weight:400}
+h1,h2,p{margin:0}button{color:inherit}
+#stage{position:fixed;inset:0;overflow:hidden}
+.board{width:2048px;height:1536px;position:absolute;transform-origin:top left;background:var(--background)}
+.board.tall{width:1536px;height:2048px}
+.board-header{position:absolute;left:48px;top:48px;height:96px;display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid var(--line);padding-bottom:16px}
+h1{font-size:48px;line-height:56px;font-weight:700;white-space:nowrap}.title-wrap{display:flex;align-items:baseline;gap:32px;min-width:0}
+.headcount{font-size:32px;line-height:40px;color:var(--secondary);white-space:nowrap}
+.header-right{display:flex;gap:32px;align-items:center;flex-shrink:0}.header-date{text-align:right}.date{font-size:32px;line-height:40px}.freshness{color:var(--secondary)}.freshness.bad{color:var(--text)}
+.clock{font-size:64px;line-height:72px;font-weight:500;white-space:nowrap}
+.panel{position:absolute;padding:24px;border-top:1px solid var(--line);overflow:hidden;cursor:pointer}
+.panel.filled{background:var(--card);border:0;border-radius:12px}
+.panel:focus-visible,.money:focus-visible{outline:2px solid var(--text);outline-offset:-2px}
+.panel-head{height:40px;display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+h2{font-size:32px;line-height:40px;font-weight:700;white-space:nowrap}.panel-count{font-size:24px;line-height:32px;color:var(--secondary);white-space:nowrap;flex-shrink:0}
+.empty{margin-top:24px;font-size:40px;line-height:48px;font-weight:500;color:var(--secondary)}
+.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.decision-title{margin-top:24px;font-size:40px;line-height:48px;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.decision-sub{margin-top:8px;color:var(--secondary)}
+.hands-list{margin-top:16px}.hand-row{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}.hand-row+.hand-row{border-top:1px solid var(--line)}
+.hand-title{font-size:40px;line-height:48px;font-weight:500}.hand-when{color:var(--secondary);white-space:nowrap;flex-shrink:0}
+.notice-list{margin-top:16px}.notice-row{min-height:60px;display:grid;grid-template-columns:16px minmax(0,1fr);column-gap:16px;align-items:start}.notice-text{grid-column:2;min-width:0;display:flex;align-items:center;gap:16px}
+.notice-title{flex:1;font-size:40px;line-height:48px;font-weight:500}.notice-extra{flex-shrink:0;font-size:24px;line-height:32px;color:var(--secondary)}
+.dot{width:16px;height:16px;display:inline-block;border-radius:50%;flex:0 0 16px}.dot.urgent{background:var(--urgent)}.dot.attention{background:var(--attention)}.dot.normal{background:var(--normal)}.notice-row>.dot{margin-top:16px}
+.schedule-list{margin-top:6px}.schedule-row{display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px;align-items:start;min-height:64px}.schedule-row.has-extra{min-height:80px}
+.schedule-time{font-size:40px;line-height:48px;font-weight:500;white-space:nowrap}.schedule-title{font-size:40px;line-height:48px;font-weight:500}.schedule-extra{color:var(--secondary)}
+.wait-columns,.wait-row{display:grid;grid-template-columns:352px minmax(0,1fr) 224px 144px;gap:16px}.wait-columns{margin-top:16px;height:32px;color:var(--secondary)}.wait-columns>:last-child{text-align:right}
+.wait-row{height:96px;align-items:center;border-bottom:1px solid var(--line)}.wait-route{font-size:32px;line-height:40px;white-space:nowrap}.route-arrow{margin:0 8px;color:var(--secondary)}
+.wait-task{font-size:40px;line-height:48px;font-weight:500}.wait-state{min-width:0}.wait-stage{font-size:32px;line-height:40px;color:var(--secondary);white-space:nowrap}.wait-alert{display:flex;gap:8px;align-items:center;font-size:24px;line-height:32px;white-space:nowrap}
+.wait-age{font-size:64px;line-height:72px;font-weight:500;text-align:right;white-space:nowrap}.unit{font-size:24px;line-height:32px;font-weight:400;margin-left:8px}
+.team-list{margin-top:16px}.team-row{height:112px;padding:8px 0;border-bottom:1px solid var(--line)}.team-row:last-child{border:0}
+.team-main{display:grid;grid-template-columns:184px minmax(0,1fr) 288px;gap:24px;align-items:center}.team-name{font-size:32px;line-height:40px;font-weight:700}.team-task{font-size:40px;line-height:48px;font-weight:500}.worker-status{display:flex;align-items:center;justify-content:flex-end;gap:8px;color:var(--secondary)}.team-worker{font-size:24px;line-height:32px;color:var(--secondary);text-align:right}
+.team-task-wrap{min-width:0}.team-meta{margin:8px 0 0 208px;color:var(--secondary)}.team-status{display:inline-flex;align-items:center;gap:8px;margin-right:24px}.rest,.past{color:var(--secondary)}
+.money{position:absolute;height:64px;display:flex;align-items:center;gap:24px;padding:0 24px;border-top:1px solid var(--line);cursor:pointer;font-size:32px;line-height:40px;white-space:nowrap}.money-value{flex-shrink:0}
+.tall .title-wrap{display:block}.tall .headcount{font-size:24px;line-height:32px}.tall .team-row{height:80px}.tall .team-meta{display:none}
+.tall .wait-columns,.tall .wait-row{grid-template-columns:352px minmax(0,1fr) 224px 144px}
+.modal-backdrop{display:none;position:fixed;inset:0;z-index:10;background:var(--background);overflow:auto;padding:clamp(16px,3vw,48px)}.modal-backdrop.open{display:block}
+.modal{max-width:1328px;margin:0 auto;padding:clamp(16px,3vw,48px);border-top:1px solid var(--line)}.modal-top{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:24px}.modal h2{font-size:40px;line-height:48px;white-space:normal}
+.modal-close{background:var(--background);border:1px solid var(--line);padding:8px 24px;border-radius:12px;cursor:pointer}.detail-row{padding:24px 0;border-top:1px solid var(--line)}.detail-title{font-size:32px;line-height:40px;font-weight:500;margin-bottom:8px;overflow-wrap:anywhere}.detail-body{color:var(--secondary);white-space:pre-wrap;overflow-wrap:anywhere}
+.chg{position:relative}.chg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--text);pointer-events:none}
+.new{animation:appear .16s ease-out}@keyframes appear{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main id="stage"><div class="board" id="board"></div></main>
+<div class="modal-backdrop" id="details" role="dialog" aria-modal="true" aria-labelledby="detail-title" tabindex="-1"><div class="modal"><div class="modal-top"><h2 id="detail-title"></h2><button type="button" class="modal-close" id="close"></button></div><div id="detail-content"></div></div></div>
+<script>
+'use strict';
+const WORDS = {
+  en: {title:'Agent wallboard', decision:'Your decisions', hands:'Needs your hands', notice:'Keep in mind', schedule:'Today', wait:'Delegated work', teams:'Teams at work', money:'Money', loading:'Loading', failed:'Could not load', data:'Data', last:'Last data', working:'working', agents:'agents', due:'Due', route:'From → To', task:'Task', stage:'Stage', age:'Wait', minute:'m', hour:'h', waiting:'Waiting', running:'In progress', received:'Result received', blocked:'Blocked', late:'Long wait', normal:'On track', idle:'Resting', close:'Close', emptyDecision:'Nothing to decide', emptyHands:'Nothing needs your hands', emptyNotice:'Nothing new to report', emptySchedule:'No remaining events', emptyWait:'No replies pending', emptyTeams:'Resting', emptyMoney:'Not yet tallied', more:n=>`+${n} more`, teamCount:n=>`${n} teams`},
+  ko: {title:'에이전트 상황판', decision:'정하실 것', hands:'직접 하실 일', notice:'알아야 할 것', schedule:'오늘 시각표', wait:'맡긴 일과 기다림', teams:'팀별 지금 하는 일', money:'돈 한 줄', loading:'불러오는 중', failed:'불러오지 못함', data:'자료', last:'마지막 자료', working:'일하는 중', agents:'일꾼', due:'기한', route:'보낸 일꾼 → 받은 일꾼', task:'맡긴 일', stage:'단계', age:'기다림', minute:'분', hour:'시간', waiting:'기다림', running:'작업 중', received:'결과 받음', blocked:'막힘', late:'오래 기다림', normal:'정상', idle:'쉬는 중', close:'닫기', emptyDecision:'정하실 것 없음', emptyHands:'직접 하실 일 없음', emptyNotice:'새로 알려 드릴 일 없음', emptySchedule:'남은 일정 없음', emptyWait:'기다리는 답 없음', emptyTeams:'쉬는 중', emptyMoney:'집계 전', more:n=>`외 ${n}건`, teamCount:n=>`${n}팀`}
+};
+const lang = new URLSearchParams(location.search).get('lang') === 'ko' ? 'ko' : 'en';
+const L = WORDS[lang];
+document.documentElement.lang = lang;
+document.title = L.title;
+document.getElementById('close').textContent = L.close;
+const WIDE = {decision:[48,160,640,256],hands:[48,432,640,304],notice:[48,752,640,288],schedule:[48,1056,640,352],wait:[704,160,1296,448],teams:[704,624,1296,784],money:[48,1424,1952,64],head:1952};
+const TALL = {decision:[48,160,712,296],hands:[776,160,712,296],notice:[48,472,712,352],schedule:[776,472,712,352],wait:[48,840,1440,448],teams:[48,1304,1440,632],money:[48,1960,1440,64],head:1440};
+const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const two = n=>String(n).padStart(2,'0');
+const clockText = ()=>{const n=new Date();return `${two(n.getHours())}:${two(n.getMinutes())}`;};
+const value = (key,text,cls='',tag='span')=>`<${tag} class="${cls}" data-value="${esc(key)}">${esc(text)}</${tag}>`;
+const dot = state=>`<span class="dot ${state}" aria-hidden="true"></span>`;
+const status = (state,text,key='')=>`${dot(state)}${key?value(key,text):`<span>${esc(text)}</span>`}`;
+const stageLabel = stage=>['waiting','running','received'].includes(stage)?L[stage]:stage;
+let D=null, failAt='', R=WIDE, snapshotAt=0, snapshotNow=null, selected='', touched=0;
+const board=document.getElementById('board'), dialog=document.getElementById('details');
+function elapsed(x){return Math.max(0,Math.floor((D.now-x.t)/60+(Date.now()-snapshotAt)/60000));}
+function age(x){const minutes=elapsed(x);return minutes<1000?[minutes,L.minute]:[Math.floor(minutes/60),L.hour];}
+function failed(){return `${L.failed}(${failAt})`;}
+function empty(label){return `<p class="empty">${esc(failAt?failed():label)}</p>`;}
+function count(total,limit){return total>limit?L.more(total-limit):total?String(total):'';}
+function panel(kind,body,total=0,limit=0,filled=false){
+  const p=R[kind];
+  return `<section class="panel ${filled?'filled':''}" style="left:${p[0]}px;top:${p[1]}px;width:${p[2]}px;height:${p[3]}px" tabindex="0" role="button" aria-label="${esc(L[kind])}" data-detail="${kind}"><div class="panel-head"><h2>${L[kind]}</h2>${value(kind+'-count',count(total,limit),'panel-count')}</div>${body}</section>`;
+}
+function notices(){
+  const groups=new Map();
+  for(const x of D.notices){const key=x.work_id||x.id; if(!groups.has(key))groups.set(key,{...x}); else if(x.blocked)groups.set(key,{...x,blocked:true});}
+  return [...groups.values()];
+}
+function requests(){return D.requests.filter(x=>!x.done);}
+function schedule(){return D.schedule.filter(x=>!x.done);}
+function decision(){const rows=D.decisions,x=rows[0];return panel('decision',x?`<div data-row="d-${esc(x.id)}">${value('decision-'+x.id,x.what,'decision-title','p')}${value('decision-sub-'+x.id,[x.by?`${L.due} ${x.by}`:'',x.stops].filter(Boolean).join(' / '),'decision-sub ell','p')}</div>`:empty(L.emptyDecision),rows.length,1,true);}
+function hands(){const rows=D.hands;return panel('hands',rows.length?`<div class="hands-list">${rows.slice(0,3).map(x=>`<div class="hand-row" data-row="h-${esc(x.id)}">${value('hands-'+x.id,x.title,'hand-title ell')}${value('hands-when-'+x.id,x.when,'hand-when')}</div>`).join('')}</div>`:empty(L.emptyHands),rows.length,3,true);}
+function notice(){const rows=notices();return panel('notice',rows.length?`<div class="notice-list">${rows.slice(0,3).map(x=>`<div class="notice-row" data-row="n-${esc(x.id)}">${dot(x.blocked?'urgent':'normal')}<div class="notice-text">${value('notice-'+x.id,x.title,'notice-title ell','p')}${value('notice-status-'+x.id,x.blocked?L.blocked:L.normal,'notice-extra ell','p')}</div></div>`).join('')}</div>`:empty(L.emptyNotice),rows.length,3);}
+function today(){const rows=schedule();return panel('schedule',rows.length?`<div class="schedule-list">${rows.slice(0,4).map(x=>`<div class="schedule-row ${x.extra?'has-extra':''}" data-row="s-${esc(x.id)}">${value('schedule-time-'+x.id,x.time,'schedule-time')}<div style="min-width:0">${value('schedule-'+x.id,x.title,'schedule-title ell','p')}${x.extra?`${value('schedule-extra-'+x.id,x.extra,'schedule-extra ell','p')}`:''}</div></div>`).join('')}</div>`:empty(L.emptySchedule),rows.length,4);}
+function wait(){const rows=requests();return panel('wait',rows.length?`<div class="wait-columns"><span>${L.route}</span><span>${L.task}</span><span>${L.stage}</span><span>${L.age}</span></div><div class="wait-list">${rows.slice(0,3).map(x=>{const [n,u]=age(x);return `<div class="wait-row" data-row="r-${esc(x.id)}">${value('request-route-'+x.id,x.fromId+' → '+x.toId,'wait-route','div')}${value('request-'+x.id,x.title,'wait-task ell')}<div class="wait-state">${value('stage-'+x.id,stageLabel(x.stage),'wait-stage')}<span class="wait-alert" data-alert="${esc(x.id)}">${x.blocked?status('urgent',L.blocked,'request-alert-'+x.id):elapsed(x)>60?status('attention',L.late,'request-alert-'+x.id):''}</span></div><div class="wait-age">${value('age-'+x.id,n,'','span')}${value('unit-'+x.id,u,'unit')}</div></div>`;}).join('')}</div>`:empty(L.emptyWait),rows.length,3);}
+function teams(){const rows=D.teams;return panel('teams',rows.length?`<div class="team-list">${rows.slice(0,6).map(x=>`<div class="team-row" data-row="t-${esc(x.name)}"><div class="team-main"><span class="team-name ell">${esc(x.name)}</span><div class="team-task-wrap">${value('team-task-'+x.name,x.task||L.idle,'team-task ell'+(!x.task?' rest':''),'p')}</div><div class="team-worker">${value('team-worker-'+x.name,x.more?x.worker.split(' ')[0]+' / '+L.more(x.more):x.worker,'ell','p')}<p class="worker-status">${status(x.blocked?'urgent':'normal',x.blocked?L.blocked:x.task?L.normal:L.idle,'team-status-'+x.name)}</p></div></div><div class="team-meta ell">${esc((x.ids||[]).join(', '))}</div></div>`).join('')}</div>`:empty(L.emptyTeams),rows.length,6);}
+function header(){const n=new Date(),date=n.toLocaleDateString(lang==='ko'?'ko-KR':'en-GB',{month:'short',day:'numeric',weekday:'short'});return `<header class="board-header" style="width:${R.head}px"><div class="title-wrap"><h1>${L.title}</h1>${D?`<p class="headcount">${value('working',D.head.working)} ${L.working} / ${value('members',D.head.members)} ${L.agents}</p>`:''}</div><div class="header-right"><div class="header-date"><p class="date">${esc(date)}</p><p class="freshness ${failAt?'bad':''}" role="status">${esc(failAt?failed():D?`${L.data} ${D.at}`:L.loading)}</p></div><p class="clock" id="clock">${clockText()}</p></div></header>`;}
+function fit(){const w=document.documentElement.clientWidth,h=document.documentElement.clientHeight,bw=R===TALL?1536:2048,bh=R===TALL?2048:1536,s=Math.min(w/bw,h/bh);board.style.transform=`scale(${s})`;board.style.left=`${(w-bw*s)/2}px`;board.style.top=`${(h-bh*s)/2}px`;}
+function trimRows(kind,listClass,total){
+  const p=board.querySelector(`[data-detail="${kind}"]`),list=p&&p.querySelector(listClass);if(!list)return;
+  const bottom=p.clientHeight-24;
+  while(list.children.length>1&&list.offsetTop+list.offsetHeight>bottom)list.lastElementChild.remove();
+  p.querySelector('.panel-count').textContent=count(total,list.children.length);
+}
+function markChanges(before){board.querySelectorAll('[data-value]').forEach(el=>{if(before.has(el.dataset.value)&&before.get(el.dataset.value)!==el.textContent){el.classList.add('chg');setTimeout(()=>el.classList.remove('chg'),800);}});}
+function render(){
+  const focused=board.querySelector(':focus')?.dataset.detail;
+  const before=new Map([...board.querySelectorAll('[data-value]')].map(el=>[el.dataset.value,el.textContent]));
+  const oldRows=new Set([...board.querySelectorAll('[data-row]')].map(el=>el.dataset.row));
+  R=document.documentElement.clientHeight>document.documentElement.clientWidth?TALL:WIDE;board.classList.toggle('tall',R===TALL);
+  board.innerHTML=header();
+  if(D){board.insertAdjacentHTML('beforeend',decision()+hands()+notice()+today()+wait()+teams()+`<section class="money" tabindex="0" role="button" aria-label="${esc(L.money)}" data-detail="money" style="left:${R.money[0]}px;top:${R.money[1]}px;width:${R.money[2]}px">${value('money',D.money||L.emptyMoney,'money-value')}</section>`);
+    trimRows('schedule','.schedule-list',schedule().length);trimRows('notice','.notice-list',notices().length);
+    if(before.size)board.querySelectorAll('[data-row]').forEach(el=>{if(!oldRows.has(el.dataset.row))el.classList.add('new');});
+  }
+  markChanges(before);fit();
+  if(focused)board.querySelector(`[data-detail="${focused}"]`)?.focus({preventScroll:true});
+  if(dialog.classList.contains('open'))detailContent(selected);
+}
+function detailContent(kind){
+  document.getElementById('detail-title').textContent=L[kind];
+  if(!D){document.getElementById('detail-content').textContent=failed();return;}
+  const rows=kind==='decision'?D.decisions:kind==='notice'?notices():kind==='wait'?requests():kind==='schedule'?schedule():kind==='money'?[{title:D.money||L.emptyMoney}]:D[kind]||[];
+  document.getElementById('detail-content').innerHTML=(failAt?`<p class="detail-body">${esc(failed()+' / '+L.last+' '+D.at)}</p>`:'')+rows.map(x=>{const title=x.what||x.title||x.task||L.idle;const text=[x.time,x.when,x.by,x.stops,x.extra,x.worker,x.name,x.more?L.more(x.more):'',(x.ids||[]).join(', '),x.stage?(stageLabel(x.stage)):'',x.original,x.updated].filter(Boolean).join('\n');return `<article class="detail-row"><p class="detail-title">${esc(title)}</p><p class="detail-body">${esc(text)}</p></article>`;}).join('');
+  if(!rows.length)document.getElementById('detail-content').textContent=failAt?failed():L[{decision:'emptyDecision',hands:'emptyHands',notice:'emptyNotice',schedule:'emptySchedule',wait:'emptyWait',teams:'emptyTeams'}[kind]];
+}
+function openDetail(kind){selected=kind;touched=Date.now();detailContent(kind);dialog.classList.add('open');dialog.scrollTop=0;document.getElementById('close').focus();}
+function closeDetail(){dialog.classList.remove('open');board.querySelector(`[data-detail="${selected}"]`)?.focus({preventScroll:true});}
+board.addEventListener('click',e=>{const el=e.target.closest('[data-detail]');if(el)openDetail(el.dataset.detail);});
+board.addEventListener('keydown',e=>{const el=e.target.closest('[data-detail]');if(el&&['Enter',' '].includes(e.key)){e.preventDefault();openDetail(el.dataset.detail);}});
+document.getElementById('close').addEventListener('click',closeDetail);
+dialog.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail();if(e.key==='Tab'){e.preventDefault();document.getElementById('close').focus();}});
+['pointerdown','scroll','keydown'].forEach(event=>dialog.addEventListener(event,()=>touched=Date.now()));
+setInterval(()=>{if(dialog.classList.contains('open')&&Date.now()-touched>90000)closeDetail();},5000);
+async function tick(){
+  try{const response=await fetch('/pad.json',{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error();const data=await response.json();if(data.error||!data.head||typeof data.at!=='string'||!['decisions','hands','notices','schedule','requests','teams'].every(k=>Array.isArray(data[k])))throw Error();if(data.now!==snapshotNow){snapshotNow=data.now;snapshotAt=Date.now();}D=data;failAt='';}
+  catch(_){failAt=clockText();}render();
+}
+function minute(){
+  const n=new Date(),c=document.getElementById('clock');if(c)c.textContent=clockText();
+  if(D){const before=new Map([...board.querySelectorAll('[data-value]')].map(el=>[el.dataset.value,el.textContent]));
+    for(const x of requests()){const el=board.querySelector(`[data-value="age-${CSS.escape(x.id)}"]`);if(!el)continue;const [a,u]=age(x);el.textContent=a;el.nextElementSibling.textContent=u;const alert=board.querySelector(`[data-alert="${CSS.escape(x.id)}"]`);alert.innerHTML=x.blocked?status('urgent',L.blocked,'request-alert-'+x.id):elapsed(x)>60?status('attention',L.late,'request-alert-'+x.id):'';}markChanges(before);
+  }
+  setTimeout(minute,60000-n.getSeconds()*1000-n.getMilliseconds()+20);
+}
+render();tick();setInterval(tick,60000);minute();
+let resizeTimer;addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(render,100);});
+if(document.fonts)document.fonts.ready.then(render);
+</script>
+</body>
+</html>

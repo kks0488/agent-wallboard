@@ -1,0 +1,172 @@
+{
+  "at": "09:00",
+  "now": 1908003600,
+  "head": {
+    "members": 8,
+    "working": 6
+  },
+  "decisions": [
+    {
+      "id": "choice-a",
+      "what": "Choose the launch bundle",
+      "by": "11:30",
+      "stops": "The product page needs a final choice."
+    },
+    {
+      "id": "choice-b",
+      "what": "Pick a cover for the field guide",
+      "by": "16:00"
+    }
+  ],
+  "hands": [
+    {
+      "id": "hand-a",
+      "title": "Photograph the sample",
+      "when": "10:30"
+    },
+    {
+      "id": "hand-b",
+      "title": "Record a short welcome",
+      "when": "13:00"
+    },
+    {
+      "id": "hand-c",
+      "title": "Check the print proof",
+      "when": "15:30"
+    }
+  ],
+  "notices": [
+    {
+      "id": "note-a",
+      "title": "Preview build is blocked",
+      "extra": "Waiting for a sample image",
+      "blocked": true
+    },
+    {
+      "id": "note-b",
+      "title": "Guide draft is ready",
+      "extra": "Ready for your afternoon review"
+    },
+    {
+      "id": "note-c",
+      "title": "Support queue is clear",
+      "extra": "All replies checked"
+    }
+  ],
+  "schedule": [
+    {
+      "id": "event-a",
+      "time": "09:30",
+      "title": "Daily plan"
+    },
+    {
+      "id": "event-b",
+      "time": "11:30",
+      "title": "Bundle review"
+    },
+    {
+      "id": "event-c",
+      "time": "13:30",
+      "title": "Guide review"
+    },
+    {
+      "id": "event-d",
+      "time": "15:30",
+      "title": "Print check"
+    },
+    {
+      "id": "event-e",
+      "time": "17:00",
+      "title": "Wrap up"
+    }
+  ],
+  "requests": [
+    {
+      "id": "request-a",
+      "fromId": "owner",
+      "toId": "agent-07",
+      "title": "Compare bundle prices",
+      "stage": "waiting",
+      "t": 1907999040
+    },
+    {
+      "id": "request-b",
+      "fromId": "owner",
+      "toId": "agent-12",
+      "title": "Prepare the field guide",
+      "stage": "running",
+      "t": 1908001560
+    },
+    {
+      "id": "request-c",
+      "fromId": "agent-07",
+      "toId": "agent-09",
+      "title": "Check sample stock",
+      "stage": "running",
+      "t": 1908002520
+    },
+    {
+      "id": "request-d",
+      "fromId": "owner",
+      "toId": "agent-15",
+      "title": "Review recurring costs",
+      "stage": "waiting",
+      "t": 1908003060
+    }
+  ],
+  "teams": [
+    {
+      "name": "Sales",
+      "task": "Price the launch bundle",
+      "worker": "agent-07 Pricing",
+      "ids": [
+        "agent-07",
+        "agent-08"
+      ],
+      "more": 1
+    },
+    {
+      "name": "Ops",
+      "task": "Check sample stock",
+      "worker": "agent-09 Stock",
+      "ids": [
+        "agent-09"
+      ]
+    },
+    {
+      "name": "Research",
+      "task": "Prepare the field guide",
+      "worker": "agent-12 Notes",
+      "ids": [
+        "agent-12"
+      ]
+    },
+    {
+      "name": "Finance",
+      "task": "Review recurring costs",
+      "worker": "agent-15 Ledger",
+      "ids": [
+        "agent-15"
+      ]
+    },
+    {
+      "name": "Web",
+      "task": "Build the product preview",
+      "worker": "agent-16 Preview",
+      "ids": [
+        "agent-16"
+      ],
+      "blocked": true
+    },
+    {
+      "name": "Support",
+      "task": "Refresh the help guide",
+      "worker": "agent-19 Help",
+      "ids": [
+        "agent-19",
+        "agent-21"
+      ]
+    }
+  ],
+  "money": "2030-06-18 / Demo sales $1,234 / 7 orders"
+}

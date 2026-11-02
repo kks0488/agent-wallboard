@@ -1,0 +1,172 @@
+{
+  "at": "09:00",
+  "now": 1908003600,
+  "head": {
+    "members": 8,
+    "working": 6
+  },
+  "decisions": [
+    {
+      "id": "choice-a",
+      "what": "출시 묶음 구성을 정해주세요",
+      "by": "11:30",
+      "stops": "상품 소개를 마무리하려면 필요합니다."
+    },
+    {
+      "id": "choice-b",
+      "what": "안내서 표지를 골라주세요",
+      "by": "16:00"
+    }
+  ],
+  "hands": [
+    {
+      "id": "hand-a",
+      "title": "견본 사진 찍기",
+      "when": "10:30"
+    },
+    {
+      "id": "hand-b",
+      "title": "짧은 인사 녹음",
+      "when": "13:00"
+    },
+    {
+      "id": "hand-c",
+      "title": "인쇄 견본 확인",
+      "when": "15:30"
+    }
+  ],
+  "notices": [
+    {
+      "id": "note-a",
+      "title": "미리보기 작업이 막혔어요",
+      "extra": "견본 사진을 기다립니다",
+      "blocked": true
+    },
+    {
+      "id": "note-b",
+      "title": "안내서 초안이 나왔어요",
+      "extra": "오후에 검토할 수 있습니다"
+    },
+    {
+      "id": "note-c",
+      "title": "문의 답변을 마쳤어요",
+      "extra": "모든 답변을 확인했습니다"
+    }
+  ],
+  "schedule": [
+    {
+      "id": "event-a",
+      "time": "09:30",
+      "title": "오늘 계획 확인"
+    },
+    {
+      "id": "event-b",
+      "time": "11:30",
+      "title": "출시 구성 검토"
+    },
+    {
+      "id": "event-c",
+      "time": "13:30",
+      "title": "안내서 검토"
+    },
+    {
+      "id": "event-d",
+      "time": "15:30",
+      "title": "인쇄물 확인"
+    },
+    {
+      "id": "event-e",
+      "time": "17:00",
+      "title": "하루 마무리"
+    }
+  ],
+  "requests": [
+    {
+      "id": "request-a",
+      "fromId": "owner",
+      "toId": "agent-07",
+      "title": "묶음 가격 비교",
+      "stage": "waiting",
+      "t": 1907999040
+    },
+    {
+      "id": "request-b",
+      "fromId": "owner",
+      "toId": "agent-12",
+      "title": "안내서 준비",
+      "stage": "running",
+      "t": 1908001560
+    },
+    {
+      "id": "request-c",
+      "fromId": "agent-07",
+      "toId": "agent-09",
+      "title": "견본 재고 확인",
+      "stage": "running",
+      "t": 1908002520
+    },
+    {
+      "id": "request-d",
+      "fromId": "owner",
+      "toId": "agent-15",
+      "title": "정기 비용 검토",
+      "stage": "waiting",
+      "t": 1908003060
+    }
+  ],
+  "teams": [
+    {
+      "name": "판매",
+      "task": "출시 묶음 가격 검토",
+      "worker": "agent-07 가격",
+      "ids": [
+        "agent-07",
+        "agent-08"
+      ],
+      "more": 1
+    },
+    {
+      "name": "운영",
+      "task": "견본 재고 확인",
+      "worker": "agent-09 재고",
+      "ids": [
+        "agent-09"
+      ]
+    },
+    {
+      "name": "조사",
+      "task": "안내서 준비",
+      "worker": "agent-12 정리",
+      "ids": [
+        "agent-12"
+      ]
+    },
+    {
+      "name": "재무",
+      "task": "정기 비용 검토",
+      "worker": "agent-15 장부",
+      "ids": [
+        "agent-15"
+      ]
+    },
+    {
+      "name": "웹",
+      "task": "상품 미리보기 제작",
+      "worker": "agent-16 미리보기",
+      "ids": [
+        "agent-16"
+      ],
+      "blocked": true
+    },
+    {
+      "name": "고객지원",
+      "task": "도움말 보완",
+      "worker": "agent-19 도움말",
+      "ids": [
+        "agent-19",
+        "agent-21"
+      ]
+    }
+  ],
+  "money": "2030-06-18 / 가상 매출 123,400원 / 7건"
+}
